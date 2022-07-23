@@ -1,54 +1,55 @@
 # fubuki
 
-fubuki是网状结构VPN实现，类似与TincVPN的简单组网工具
+fubuki è un'implementazione VPN mesh, simile a un semplice strumento di rete come TincVPN
 
-当前支持的平台：
+Piattaforme attualmente supportate:
 
 - Windows
 - Linux
 - macOS
 
-## 工作机制
+## Principio di funzionamento
 
-它需要一台公网服务器来维持客户端节点的地址映射，节点相互P2P通信，节点之间可能因NAT受限等问题无法通信时会切换为服务端中继
+Richiede un server di rete pubblica per mantenere la mappatura degli indirizzi dei nodi client. I nodi comunicano tra loro P2P. Quando i nodi non possono comunicare a causa di restrizioni NAT e altri problemi, passeranno ai relè del server.
 
-## 使用
+## Come si usa
 
-[配置文件说明](https://github.com/xutianyi1999/fubuki/tree/master/cfg-example)
-### 前置依赖
+[Descrizione del file di configurazione](https://github.com/Giancarlo1974/fubuki/tree/master/cfg-example)
+### Pre-dipendenze
 
 #### Windows
-需要wintun.dll(https://www.wintun.net) 与执行文件同目录或System32下，并且能以管理员权限运行
+Wintun.dll (https://www.wintun.net) deve trovarsi nella stessa directory del file eseguibile o in System32 e può essere eseguito con privilegi di amministratore
 
 #### Linux & macOS
-需要内核支持TUN模块, 并能以root运行
+Richiede che il kernel supporti il ​​modulo TUN e sia in grado di funzionare come root
 
-### 客户端命令
-节点启动：
+### Comandi client
+Avvio del nodo:
 
 ```shell
 sudo ./fubuki client client-config.json
 ```
-查看节点信息：
+Visualizza le informazioni sul nodo:
 ```shell
 ./fubuki info
 ```
-或指定API地址
+o specificare l'indirizzo API
 ```shell
 ./fubuki info "127.0.0.1:1234"
 ```
-### 服务端命令
-服务端启动：
+### Comandi del server
+Avvio del server:
 ```shell
 ./fubuki server server-config.json
 ```
 
-## 源码构建
-安装Rust环境
+## Generazione di origine
+Installa l'ambiente Rust
 
-Windows平台toolchain需要为MSVC
+La toolchain della piattaforma Windows deve essere MSVC
+Installazione di Rust su Windows con MSVC Toolchain
 
-如果需要开启AES-NI指令集，添加环境变量`RUSTFLAGS="-C target-cpu=native"`
+Se è necessario abilitare il set di istruzioni AES-NI, aggiungere una variabile di ambiente `RUSTFLAGS="-C target-cpu=native"`
 ```shell
 git clone "https://github.com/xutianyi1999/fubuki";
 cd fubuki;
