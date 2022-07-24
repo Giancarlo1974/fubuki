@@ -17,7 +17,7 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceRoot}/target/debug/fubuki",
-            "args": [],
+            "args": ["server", "server-config.json"],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "rust: cargo build"
         }

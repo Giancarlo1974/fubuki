@@ -31,20 +31,20 @@ mod tun;
 static GLOBAL: MiMalloc = MiMalloc;
 
 #[derive(Deserialize, Clone)]
-struct Listener {
+struct Listener { // la trovi in server-config.json
     listen_addr: SocketAddr,
     key: String,
 }
 
 #[derive(Deserialize, Clone)]
-struct ServerConfig {
+struct ServerConfig { // la trovi in server-config.json
     channel_limit: Option<usize>,
     tcp_heartbeat_interval_secs: Option<u64>,
     listeners: Vec<Listener>,
 }
 
 #[derive(Clone)]
-struct ServerConfigFinalize {
+struct ServerConfigFinalize { // usato da fn try_from(config: ServerConfig) -> Result<Self> contiene una riebolazione di struct ServerConfig
     channel_limit: usize,
     tcp_heartbeat_interval: Duration,
     listeners: Vec<Listener>,
@@ -55,12 +55,12 @@ impl TryFrom<ServerConfig> for ServerConfigFinalize {
 
     fn try_from(config: ServerConfig) -> Result<Self> {
         let config_finalize = Self {
-            channel_limit: config.channel_limit.unwrap_or(100),
-            tcp_heartbeat_interval: config
+            channel_limit: config.channel_limit.unwrap_or(100), // imposta il valore channel_limit o in alternativa 100
+            tcp_heartbeat_interval: config // imposta il valore tcp_heartbeat_interval_secs (con un max di 10) o in alternativa 5
                 .tcp_heartbeat_interval_secs
                 .map(|sec| Duration::from_secs(ternary!(sec > 10, 10, sec)))
                 .unwrap_or(Duration::from_secs(5)),
-            listeners: {
+            listeners: { // imposta i valori contenuti in listeners, assicurandosi che non ci siano interfacce impostate su loopback 127.0.0.1
                 for listener in &config.listeners {
                     if listener.listen_addr.ip().is_loopback() {
                         return Err(anyhow!("Listen address cannot be a loopback address"));
@@ -254,8 +254,9 @@ fn launch() -> Result<()> {
         Args::Server(path) => {
             let config: ServerConfig = load_config(path.as_deref().unwrap_or("config.json"))?;
 
-            block_on!(async {
-                server::start(ServerConfigFinalize::try_from(config)?).await;
+            let scf = ServerConfigFinalize::try_from(config)?;
+            block_on!(async { // aspetta che il thread venga completato
+                server::start(scf).await;
                 Ok(())
             })
         }
